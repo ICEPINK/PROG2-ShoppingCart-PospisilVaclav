@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 public class MainFrame extends JFrame implements ActionListener {
 
     JButton btnInputAdd;
+    JTextField txtInputName;
+    JTextField txtInputNameCK;
+    JTextField txtInputNamePK;
 
     public MainFrame(int width,int height) {
         super("PRO2 - Shopping cart");
@@ -34,13 +37,13 @@ public class MainFrame extends JFrame implements ActionListener {
         JPanel panelFooter = new JPanel();
 
         JLabel lbl = new JLabel("Nazev: ");
-        JTextField txtInputName = new JTextField("",15);
+        txtInputName = new JTextField("",15);
 
         JLabel lblCK = new JLabel("Cena/Kus: ");
-        JTextField txtInputNameCK = new JTextField("",5);
+        txtInputNameCK = new JTextField("",5);
 
         JLabel lblPK = new JLabel("Pocet kusu: ");
-        JTextField txtInputNamePK = new JTextField("",5);
+        txtInputNamePK = new JTextField("",5);
 
         btnInputAdd = new JButton("Pridat: ");
         btnInputAdd.addActionListener(this);
@@ -66,7 +69,7 @@ public class MainFrame extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if(actionEvent.getSource()==btnInputAdd) {
-            System.out.println("Cozee");
+            System.out.println("Polozka: " + txtInputName.getText() +" Cena za kus: "+ txtInputNameCK.getText() +" Po4et kusu: "+ txtInputNamePK.getText());
         }
     }
 }
