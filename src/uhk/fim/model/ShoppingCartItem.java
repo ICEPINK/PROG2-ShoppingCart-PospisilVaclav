@@ -5,7 +5,7 @@ public class ShoppingCartItem {
     private double pricePerPiece;
     private int pieces;
 
-    public ShoppingCartItem(String name, double pricePerPiece, int pieces) {
+    public ShoppingCartItem(String name, double pricePerPiece, int pieces) throws Exception {
         this.name = name;
         this.pricePerPiece = pricePerPiece;
         this.pieces = pieces;

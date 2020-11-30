@@ -1,1 +1,1 @@
-UHK PROG2
+UHK PROG2 Václav Pospíšil
