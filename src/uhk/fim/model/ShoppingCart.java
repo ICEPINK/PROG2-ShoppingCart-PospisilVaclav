@@ -15,21 +15,20 @@ public class ShoppingCart {
     }
 
     public void addItem(ShoppingCartItem item){
-        items.add(item);
-        for (int i = 0;i<items.size()-1;i++) {
-            if(items.get(i).getName().equals(item.getName())&&items.get(i).getPricePerPiece()==item.getPricePerPiece()){
-                items.remove(items.size()-1);
-                items.get(i).setPieces(item.getPieces()+items.get(i).getPieces());
-                break;
+        for (ShoppingCartItem shoppingCartItem : items) {
+            if(shoppingCartItem.getName().equals(item.getName())&&shoppingCartItem.getPricePerPiece()==item.getPricePerPiece()){
+                shoppingCartItem.setPieces(item.getPieces()+shoppingCartItem.getPieces());
+                return;
             }
         }
+        items.add(item);
     }
 
     public double getTotalPrice() {
         double totalPrice = 0;
         for(int i=0; i < getItems().size(); i++){
             ShoppingCartItem item = getItems().get(i);
-            totalPrice = (totalPrice+(item.getPieces()* item.getPricePerPiece()));
+            totalPrice = (totalPrice+(item.getTotalPrice()));
         }
         return totalPrice;
     }

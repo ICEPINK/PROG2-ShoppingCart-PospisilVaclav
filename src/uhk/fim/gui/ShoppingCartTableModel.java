@@ -30,7 +30,7 @@ public class ShoppingCartTableModel extends AbstractTableModel {
             case 2:
                 return item.getPieces();
             case 3:
-                return item.getPieces()*item.getPricePerPiece();
+                return item.getTotalPrice();
             default:
                 return null;
         }
@@ -47,6 +47,21 @@ public class ShoppingCartTableModel extends AbstractTableModel {
                 return "Pieces";
             case 3:
                 return "TotalPrice";
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        switch (columnIndex){
+            case 0:
+                return String.class;
+            case 1:
+            case 3:
+                return Double.class;
+            case 2:
+                return Integer.class;
             default:
                 return null;
         }

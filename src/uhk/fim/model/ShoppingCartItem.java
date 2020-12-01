@@ -34,5 +34,8 @@ public class ShoppingCartItem {
     public void setPieces(int pieces) {
         this.pieces = pieces;
     }
-    //test01
+
+    public double getTotalPrice(){
+        return getPieces()*getPricePerPiece();
+    }
 }
