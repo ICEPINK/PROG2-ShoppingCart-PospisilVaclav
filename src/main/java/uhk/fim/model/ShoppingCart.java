@@ -24,6 +24,10 @@ public class ShoppingCart {
         items.add(item);
     }
 
+    public void setItems(List<ShoppingCartItem> items) {
+        this.items = items;
+    }
+
     public double getTotalPrice() {
         double totalPrice = 0;
         for(int i=0; i < getItems().size(); i++){

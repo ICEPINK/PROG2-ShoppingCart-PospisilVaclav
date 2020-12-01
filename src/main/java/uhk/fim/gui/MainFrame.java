@@ -8,6 +8,7 @@ import org.dom4j.io.SAXReader;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import uhk.fim.model.IOFile;
 import uhk.fim.model.ShoppingCart;
 import uhk.fim.model.ShoppingCartItem;
 
@@ -154,15 +155,14 @@ public class MainFrame extends JFrame {
         fileMenu.add(new AbstractAction("OPEN") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //loadFileXmlSax();
-                //JOptionPane.showMessageDialog(mainFrame, "OPEN", "filemenu - OPEN", JOptionPane.INFORMATION_MESSAGE);
-                loadFileXmlDom4j();
+                shoppingCart.setItems(IOFile.loadJson("src/testFileJson.json").getItems());
+                updateAll();
             }
         });
         fileMenu.add(new AbstractAction("SAVE") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                safeFileCsv();
+                IOFile.saveJson(shoppingCart, "src/testFileJson.json");
             }
         });
         menuBar.add(fileMenu);
@@ -173,10 +173,17 @@ public class MainFrame extends JFrame {
         setJMenuBar(menuBar);
     }
 
+    private void updateAll(){
+        updateFooter();
+        shoppingCartTableModel.fireTableDataChanged();
+    }
+
     private void updateFooter(){
         lblTotalPrice.setText("lblTotalPrice " + Math.round(shoppingCart.getTotalPrice()));
     }
 
+
+/*
     private void safeFileCsv(){
         JFileChooser fc = new JFileChooser();
         int result = fc.showSaveDialog(this);
@@ -197,7 +204,6 @@ public class MainFrame extends JFrame {
     }
 
     private void loadFileXmlSax(){
-        /*
         try {
             CharArrayWriter content = new CharArrayWriter();
             SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
@@ -225,8 +231,6 @@ public class MainFrame extends JFrame {
         } catch (IOException e){
             e.printStackTrace();
         }
-
-         */
     }
 
     private void loadFileXmlDom4j(){
@@ -240,14 +244,5 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void loadJson(){
-        Gson gson = new Gson();
-        try {
-            ShoppingCart cart = gson.fromJson(new InputStreamReader(
-                    new URL("https://lide.uhk.cz/fim/student/benesja4/shoppingCart.json").openStream()
-            ),ShoppingCart.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+ */
 }
