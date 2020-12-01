@@ -1,29 +1,16 @@
 package uhk.fim.gui;
 
-import com.google.gson.Gson;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentFactory;
-import org.dom4j.io.SAXReader;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 import uhk.fim.model.IOFile;
 import uhk.fim.model.ShoppingCart;
 import uhk.fim.model.ShoppingCartItem;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import java.io.*;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class MainFrame extends JFrame {
@@ -57,7 +44,7 @@ public class MainFrame extends JFrame {
     JMenu aboutMenu;
 
     public MainFrame(int width, int height) {
-        super("MainFrame");
+        super("UHK Václav pospíšil");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -79,34 +66,34 @@ public class MainFrame extends JFrame {
         panelFooter = new JPanel(new BorderLayout());
 
         //label + textField
-        lblInputName = new JLabel("InputName");
+        lblInputName = new JLabel("Název");
         txtInputName = new JTextField("", 15);
 
-        lblInputPricePerPiece = new JLabel("InputPricePerPiece");
+        lblInputPricePerPiece = new JLabel("Cena/kus");
         txtInputPricePerPiece = new JTextField("", 5);
 
-        lblInputPieces = new JLabel("lblInputPieces");
+        lblInputPieces = new JLabel("Počet kusů");
         spInputPieces = new JSpinner(new SpinnerNumberModel(1, 1, 999, 1));
 
-        lblTotalPrice = new JLabel("lblTotalPrice " + shoppingCart.getTotalPrice());
+        lblTotalPrice = new JLabel("Celková cena: " +Math.round(shoppingCart.getTotalPrice())+" Kč");
 
         //button
-        btnInputAdd = new JButton("btnInputAdd");
+        btnInputAdd = new JButton("Přidat");
         btnInputAdd.addActionListener(e -> {
             try {
                 double price;
                 try {
                     price = Double.parseDouble(txtInputPricePerPiece.getText().replace(",", "."));
                 } catch (Exception ex) {
-                    throw new Exception("NotDouble");
+                    throw new Exception("Zadejte Double");
                 }
                 ShoppingCartItem shoppingCartItem = new ShoppingCartItem(txtInputName.getText(), price, (int) spInputPieces.getValue());
                 if (shoppingCartItem.getName().trim().isEmpty()) {
-                    throw new Exception("IsEmpty");
+                    throw new Exception("Prázdné pole");
                 } else if (shoppingCartItem.getName().length() > 100) {
-                    throw new Exception("IsBiggerThen100");
+                    throw new Exception("název je větší než 100");
                 } else if (shoppingCartItem.getPricePerPiece() < 0) {
-                    throw new Exception("IsNegative");
+                    throw new Exception("Cena je záporná");
                 } else {
                     shoppingCart.addItem(shoppingCartItem);
                     shoppingCartTableModel.fireTableDataChanged();
@@ -116,7 +103,7 @@ public class MainFrame extends JFrame {
                     JOptionPane.showMessageDialog(mainFrame, "Položka přidána", "JOptionPane - btnInputAdd", JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(mainFrame, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(mainFrame, ex.getMessage(), "Chyba", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -147,8 +134,8 @@ public class MainFrame extends JFrame {
     private void createMenuBar() {
         menuBar = new JMenuBar();
 
-        fileMenu = new JMenu("FILE");
-        fileMenu.add(new AbstractAction("NEW") {
+        fileMenu = new JMenu("Soubor");
+        fileMenu.add(new AbstractAction("Nový") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IOFile.save(new ShoppingCart(), new File("src/main/java/uhk/fim/model/storage.csv"));
@@ -156,20 +143,20 @@ public class MainFrame extends JFrame {
                 updateAll();
             }
         });
-        fileMenu.add(new AbstractAction("OPEN") {
+        fileMenu.add(new AbstractAction("Otevřít") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 shoppingCart.setItems(IOFile.load(chooseFile()).getItems());
                 updateAll();
             }
         });
-        fileMenu.add(new AbstractAction("SAVE") {
+        fileMenu.add(new AbstractAction("Uložit") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IOFile.save(shoppingCart, new File("src/main/java/uhk/fim/model/storage.csv"));
             }
         });
-        fileMenu.add(new AbstractAction("SAVE AS") {
+        fileMenu.add(new AbstractAction("Uložit jako") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IOFile.save(shoppingCart, chooseFile());
@@ -177,7 +164,7 @@ public class MainFrame extends JFrame {
         });
         menuBar.add(fileMenu);
 
-        aboutMenu = new JMenu("ABOUT");
+        aboutMenu = new JMenu("O programu");
         menuBar.add(aboutMenu);
 
         setJMenuBar(menuBar);
@@ -189,14 +176,14 @@ public class MainFrame extends JFrame {
     }
 
     private void updateFooter() {
-        lblTotalPrice.setText("lblTotalPrice " + Math.round(shoppingCart.getTotalPrice()));
+        lblTotalPrice.setText("Celková cena: " + Math.round(shoppingCart.getTotalPrice()) + " Kč");
     }
 
     private File chooseFile() {
         JFileChooser fc = new JFileChooser();
 
-        fc.addChoosableFileFilter(new FileNameExtensionFilter(".json file", "json"));
-        fc.addChoosableFileFilter(new FileNameExtensionFilter(".csv file", "csv"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter(".json soubor", "json"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter(".csv soubor", "csv"));
         fc.setAcceptAllFileFilterUsed(false);
 
         int returnVal = fc.showDialog(this, "Vybrat");

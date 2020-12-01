@@ -34,10 +34,10 @@ public class ShoppingCartTableModel extends AbstractTableModel {
     @Override
     public String getColumnName(int column) {
         return switch (column) {
-            case 0 -> "Name";
-            case 1 -> "PricePerPiece";
-            case 2 -> "Pieces";
-            case 3 -> "TotalPrice";
+            case 0 -> "Název";
+            case 1 -> "Cena/kus";
+            case 2 -> "Počet kusů";
+            case 3 -> "Cena za všechny kusy";
             default -> null;
         };
     }
