@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainFrame extends JFrame {
 
@@ -54,12 +56,12 @@ public class MainFrame extends JFrame {
     JMenu fileMenu;
     JMenu aboutMenu;
 
-    public MainFrame(int width,int height) {
+    public MainFrame(int width, int height) {
         super("MainFrame");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        shoppingCart = new ShoppingCart();
+        shoppingCart = new ShoppingCart(Objects.requireNonNull(IOFile.load(new File("src/main/java/uhk/fim/model/storage.csv"))));
         shoppingCartTableModel = new ShoppingCartTableModel();
         shoppingCartTableModel.setShoppingCart(shoppingCart);
 
@@ -78,10 +80,10 @@ public class MainFrame extends JFrame {
 
         //label + textField
         lblInputName = new JLabel("InputName");
-        txtInputName = new JTextField("",15);
+        txtInputName = new JTextField("", 15);
 
         lblInputPricePerPiece = new JLabel("InputPricePerPiece");
-        txtInputPricePerPiece = new JTextField("",5);
+        txtInputPricePerPiece = new JTextField("", 5);
 
         lblInputPieces = new JLabel("lblInputPieces");
         spInputPieces = new JSpinner(new SpinnerNumberModel(1, 1, 999, 1));
@@ -93,18 +95,17 @@ public class MainFrame extends JFrame {
         btnInputAdd.addActionListener(e -> {
             try {
                 double price;
-                try{
-                    price = Double.parseDouble(txtInputPricePerPiece.getText().replace(",","."));
-                }
-                catch (Exception ex){
+                try {
+                    price = Double.parseDouble(txtInputPricePerPiece.getText().replace(",", "."));
+                } catch (Exception ex) {
                     throw new Exception("NotDouble");
                 }
-                ShoppingCartItem shoppingCartItem = new ShoppingCartItem(txtInputName.  getText(), price, (int) spInputPieces.getValue());
-                if(shoppingCartItem.getName().trim().isEmpty()){
+                ShoppingCartItem shoppingCartItem = new ShoppingCartItem(txtInputName.getText(), price, (int) spInputPieces.getValue());
+                if (shoppingCartItem.getName().trim().isEmpty()) {
                     throw new Exception("IsEmpty");
-                } else if (shoppingCartItem.getName().length()>100){
+                } else if (shoppingCartItem.getName().length() > 100) {
                     throw new Exception("IsBiggerThen100");
-                } else if (shoppingCartItem.getPricePerPiece()<0){
+                } else if (shoppingCartItem.getPricePerPiece() < 0) {
                     throw new Exception("IsNegative");
                 } else {
                     shoppingCart.addItem(shoppingCartItem);
@@ -114,8 +115,7 @@ public class MainFrame extends JFrame {
 
                     JOptionPane.showMessageDialog(mainFrame, "Položka přidána", "JOptionPane - btnInputAdd", JOptionPane.INFORMATION_MESSAGE);
                 }
-            }
-            catch (Exception ex){
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(mainFrame, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -144,14 +144,16 @@ public class MainFrame extends JFrame {
         add(panelMain);
     }
 
-    private void createMenuBar(){
+    private void createMenuBar() {
         menuBar = new JMenuBar();
 
         fileMenu = new JMenu("FILE");
         fileMenu.add(new AbstractAction("NEW") {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                IOFile.save(new ShoppingCart(), new File("src/main/java/uhk/fim/model/storage.csv"));
+                shoppingCart.setItems((Objects.requireNonNull(IOFile.load(new File("src/main/java/uhk/fim/model/storage.csv")))).getItems());
+                updateAll();
             }
         });
         fileMenu.add(new AbstractAction("OPEN") {
@@ -162,6 +164,12 @@ public class MainFrame extends JFrame {
             }
         });
         fileMenu.add(new AbstractAction("SAVE") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                IOFile.save(shoppingCart, new File("src/main/java/uhk/fim/model/storage.csv"));
+            }
+        });
+        fileMenu.add(new AbstractAction("SAVE AS") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 IOFile.save(shoppingCart, chooseFile());
@@ -175,20 +183,20 @@ public class MainFrame extends JFrame {
         setJMenuBar(menuBar);
     }
 
-    private void updateAll(){
+    private void updateAll() {
         updateFooter();
         shoppingCartTableModel.fireTableDataChanged();
     }
 
-    private void updateFooter(){
+    private void updateFooter() {
         lblTotalPrice.setText("lblTotalPrice " + Math.round(shoppingCart.getTotalPrice()));
     }
 
-    private File chooseFile(){
+    private File chooseFile() {
         JFileChooser fc = new JFileChooser();
 
-        fc.addChoosableFileFilter(new FileNameExtensionFilter(".json file","json"));
-        fc.addChoosableFileFilter(new FileNameExtensionFilter(".csv file","csv"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter(".json file", "json"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter(".csv file", "csv"));
         fc.setAcceptAllFileFilterUsed(false);
 
         int returnVal = fc.showDialog(this, "Vybrat");
@@ -204,70 +212,4 @@ public class MainFrame extends JFrame {
         }
         return null;
     }
-
-
-
-
-/*
-    private void safeFileCsv(){
-        JFileChooser fc = new JFileChooser();
-        int result = fc.showSaveDialog(this);
-
-        if(result == JFileChooser.APPROVE_OPTION){
-            String fileName = fc.getSelectedFile().getAbsolutePath();
-
-            try (BufferedWriter bfw = new BufferedWriter(new FileWriter(fileName))){
-                for (ShoppingCartItem item : shoppingCart.getItems()){
-                    bfw.write(item.getName()+";"+item.getPricePerPiece()+";"+item.getPieces());
-                    bfw.newLine();
-                }
-            }
-            catch (IOException e){
-                JOptionPane.showMessageDialog(mainFrame, "ERROR", "BufferedWriter - Error", JOptionPane.INFORMATION_MESSAGE);
-            }
-        }
-    }
-
-    private void loadFileXmlSax(){
-        try {
-            CharArrayWriter content = new CharArrayWriter();
-            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-            parser.parse(new File("src/uhk/fim/shoppingCart"), new DefaultHandler(){
-                @Override
-                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                    content.reset();
-                }
-
-                @Override
-                public void endElement(String uri, String localName, String qName) throws SAXException {
-                    System.out.println(qName + ": " + content.toString());
-                }
-
-                @Override
-                public void characters(char[] ch, int start, int length) throws SAXException {
-                    super.characters(ch, start, length);
-                    content.write(ch, start, length);
-                }
-            });
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    private void loadFileXmlDom4j(){
-        DocumentFactory df = DocumentFactory.getInstance();
-        SAXReader reader = new SAXReader(df);
-
-        try {
-            Document doc = reader.read(new File("src/shoppingCart.xml"));
-        } catch (DocumentException e) {
-            e.printStackTrace();
-        }
-    }
-
- */
 }

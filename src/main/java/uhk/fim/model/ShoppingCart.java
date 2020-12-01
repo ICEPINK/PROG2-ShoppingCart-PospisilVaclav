@@ -9,6 +9,9 @@ public class ShoppingCart {
     public ShoppingCart() {
         this.items = new ArrayList<>();
     }
+    public ShoppingCart(ShoppingCart shoppingCart) {
+        this.items = shoppingCart.getItems();
+    }
 
     public List<ShoppingCartItem> getItems() {
         return items;
