@@ -13,6 +13,8 @@ import uhk.fim.model.ShoppingCart;
 import uhk.fim.model.ShoppingCartItem;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -149,20 +151,20 @@ public class MainFrame extends JFrame {
         fileMenu.add(new AbstractAction("NEW") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(mainFrame, "NEW", "filemenu - NEW", JOptionPane.INFORMATION_MESSAGE);
+
             }
         });
         fileMenu.add(new AbstractAction("OPEN") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                shoppingCart.setItems(IOFile.loadJson("src/testFileJson.json").getItems());
+                shoppingCart.setItems(IOFile.load(chooseFile()).getItems());
                 updateAll();
             }
         });
         fileMenu.add(new AbstractAction("SAVE") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                IOFile.saveJson(shoppingCart, "src/testFileJson.json");
+                IOFile.save(shoppingCart, chooseFile());
             }
         });
         menuBar.add(fileMenu);
@@ -181,6 +183,29 @@ public class MainFrame extends JFrame {
     private void updateFooter(){
         lblTotalPrice.setText("lblTotalPrice " + Math.round(shoppingCart.getTotalPrice()));
     }
+
+    private File chooseFile(){
+        JFileChooser fc = new JFileChooser();
+
+        fc.addChoosableFileFilter(new FileNameExtensionFilter(".json file","json"));
+        fc.addChoosableFileFilter(new FileNameExtensionFilter(".csv file","csv"));
+        fc.setAcceptAllFileFilterUsed(false);
+
+        int returnVal = fc.showDialog(this, "Vybrat");
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+            if (file.getName().endsWith("json")) {
+                return file;
+            } else if (file.getName().endsWith("csv")) {
+                return file;
+            }
+            JOptionPane.showMessageDialog(fc, "Vlozte spravny format\n Koncovku souboru .json nebo .csv", "JOptionPane - btnInputAdd", JOptionPane.INFORMATION_MESSAGE);
+        }
+        return null;
+    }
+
+
 
 
 /*
